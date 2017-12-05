@@ -5,13 +5,12 @@
   "main": "bot.js",
   "author": "Brian DeMaio",
   "license": "MIT",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/briguyd/fight-bot.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/briguyd/fight-bot.git"
   },
   "dependencies": {
-    "discord.io": "^2.5.3",
-    "sqlite3": "^3.1.13",
+    "discord.js": "^11.2.1",
     "winston": "^2.4.0"
   }
 }
