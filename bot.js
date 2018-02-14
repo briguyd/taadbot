@@ -10,16 +10,18 @@ logger.add(logger.transports.Console, {
 });
 logger.level = 'debug';
 // Initialize Discord Bot
-// var bot = new Discord.Client({
-//     token: config.token,
-//     autorun: true
-// });
 client.on('ready', function (evt) {
     logger.info('Connected');
     logger.info('Logged in as: ');
     logger.info(client.user.username + ' - (' + client.user.id + ')');
 });
 
+client.on('channelUpdate', (oldCh, newCh) => {
+    newCh.guild.fetchAuditLogs({limit: 1}).then(audit => {
+        const userId = audit.entries.first().executor.id;
+        newCh.send('<@' + userId + '> changed topic to `' + newCh.topic + '`');
+    });
+});
 
 client.on('message', msg => {
     // Our bot needs to know if it will execute a command
