@@ -21,7 +21,6 @@ client.on('channelUpdate', (oldCh, newCh) => {
         newCh.guild.fetchAuditLogs({ limit: 1, type: Discord.GuildAuditLogs.Actions.CHANNEL_UPDATE }).then(audit => {
             const userId = audit.entries.first().executor.id;
             for (const change of audit.entries.first().changes) {
-                console.log(change);
                 if (change.key === 'topic') {
                     newCh.send('<@' + userId + '> changed topic to `' + newCh.topic + '`');
                 }
