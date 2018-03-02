@@ -17,10 +17,17 @@ client.on('ready', function (evt) {
 });
 
 client.on('channelUpdate', (oldCh, newCh) => {
-    newCh.guild.fetchAuditLogs({limit: 1}).then(audit => {
-        const userId = audit.entries.first().executor.id;
-        newCh.send('<@' + userId + '> changed topic to `' + newCh.topic + '`');
-    });
+    if (oldCh.topic !== newCh.topic) {
+        newCh.guild.fetchAuditLogs({ limit: 1, type: Discord.GuildAuditLogs.Actions.CHANNEL_UPDATE }).then(audit => {
+            const userId = audit.entries.first().executor.id;
+            for (const change of audit.entries.first().changes) {
+                console.log(change);
+                if (change.key === 'topic') {
+                    newCh.send('<@' + userId + '> changed topic to `' + newCh.topic + '`');
+                }
+            }
+        });
+    }
 });
 
 client.on('message', msg => {
@@ -42,7 +49,7 @@ client.on('message', msg => {
                 msg.channel.send('MORTAL KOMBAT!');
                 break;
             case 'fight':
-                
+
                 let fightMessage = '<@' + msg.author.id + '> has declared a fight with ';
                 for (let [mentionedKey, mentionedUser] of msg.mentions.users) {
                     if (mentionedUser.bot) {
@@ -52,7 +59,7 @@ client.on('message', msg => {
                     fightMessage += '<@' + mentionedUser.id + '>';
                 }
 
-                
+
                 // to: config.fight-channel,
                 msg.channel.send(fightMessage)
                     .then(message => message.pin());
@@ -60,9 +67,6 @@ client.on('message', msg => {
                 break;
         }
     }
-});
-
-client.on('messageDelete', function (event) {
 });
 
 client.login(config.token);
