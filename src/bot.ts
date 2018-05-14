@@ -1,6 +1,6 @@
 import * as discord from 'discord.js';
 import * as logger from 'winston';
-import { Client, Message } from 'discord.js';
+import { Client, TextChannel, Message, GuildAuditLogs } from 'discord.js';
 const config = require('../config.json');
 
 export class Bot {
@@ -23,6 +23,19 @@ export class Bot {
         logger.info('Connected');
         logger.info('Logged in as: ');
         logger.info(this.client.user.username + ' - (' + this.client.user.id + ')');
+    }
+
+    _onChannelUpdate(oldCh: TextChannel, newCh: TextChannel) {
+        if (oldCh.topic !== newCh.topic) {
+            newCh.guild.fetchAuditLogs({ limit: 1, type: GuildAuditLogs.Actions.CHANNEL_UPDATE }).then(audit => {
+                const userId = audit.entries.first().executor.id;
+                for (const change of audit.entries.first().changes) {
+                    if (change.key === 'topic') {
+                        newCh.send('<@' + userId + '> changed topic to `' + newCh.topic + '`');
+                    }
+                }
+            });
+        }
     }
 
     _onMessage(msg: any) {
