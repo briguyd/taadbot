@@ -59,3 +59,6 @@ typings/
 
 # bot config file
 /config.json
+
+# build Output
+dist/

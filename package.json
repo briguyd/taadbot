@@ -2,9 +2,13 @@
   "name": "fight-bot",
   "version": "0.0.1",
   "description": "Ready? Fight!",
-  "main": "bot.js",
+  "main": "dist/index",
   "author": "Brian DeMaio",
   "license": "MIT",
+  "scripts": {
+    "start": "npm run build:live",
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/briguyd/fight-bot.git"
@@ -12,5 +16,12 @@
   "dependencies": {
     "discord.js": "^11.2.1",
     "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^10.0.8",
+    "@types/winston": "^2.3.9",
+    "nodemon": "^1.17.4",
+    "ts-node": "^6.0.3",
+    "typescript": "^2.8.3"
   }
 }
