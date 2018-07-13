@@ -15,6 +15,8 @@ export class Bot {
         logger.info('Bot starting');
         this.client.on('ready', this._onReady.bind(this));
         this.client.on('message', this._onMessage.bind(this));
+        this.client.on('channelUpdate', this._onChannelUpdate.bind(this));
+        
         this.client.on('error', logger.error);
         this.client.login(config.token);
     }
