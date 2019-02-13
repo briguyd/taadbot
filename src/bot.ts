@@ -5,6 +5,7 @@ const config = require('../config.json');
 
 export class Bot {
 
+    private PIN_EMOJI = '📌';
     private client: Client;
 
     constructor() {
@@ -15,6 +16,8 @@ export class Bot {
         logger.info('Bot starting');
         this.client.on('ready', this._onReady.bind(this));
         this.client.on('message', this._onMessage.bind(this));
+        this.client.on('messageReactionAdd', this._onReactAdd.bind(this));
+        this.client.on('messageReactionRemove', this._onReactRemove.bind(this));
         this.client.on('channelUpdate', this._onChannelUpdate.bind(this));
         
         this.client.on('error', logger.error);
@@ -40,7 +43,30 @@ export class Bot {
         }
     }
 
-    _onMessage(msg: any) {
+    _onReactAdd(messageReaction: discord.MessageReaction, user: discord.User) {
+        if (messageReaction.emoji.name === this.PIN_EMOJI) {
+            messageReaction.message.pin();
+        }
+    }
+
+    _onReactRemove(messageReaction: discord.MessageReaction, user: discord.User) {
+        if (messageReaction.emoji.name === this.PIN_EMOJI) {
+            let shouldUnpin = true;
+            if (messageReaction.message.reactions) {
+                for (let [reactKey, reaction] of messageReaction.message.reactions) {
+                    if (reaction.emoji.name === this.PIN_EMOJI) {
+                        shouldUnpin = false;
+                        break;
+                    }
+                }
+            }
+            if (shouldUnpin) {
+                messageReaction.message.unpin();
+            }
+        }
+    }
+
+    _onMessage(msg: Message) {
         // Our bot needs to know if it will execute a command
         // It will listen for messages that will start with `!`
 
