@@ -17,9 +17,6 @@ export class Roll implements OnMessage {
       if (diceRegex.test(args.join(" "))) {
         const result = diceRegex.exec(args.join(" "));
         if (result) {
-          console.log(result.groups);
-
-          //   let [, , diceCount, sides] = result.groups;
           if (result[3]) {
             let total = 0;
             let diceCount = 1;
