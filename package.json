@@ -7,6 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "npm run build:live",
+    "debug": "nodemon --inspect ./node_modules/.bin/ts-node -- ./src/index.ts",
     "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/index.ts"
   },
   "repository": {

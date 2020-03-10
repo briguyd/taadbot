@@ -1,11 +1,15 @@
 import * as discord from "discord.js";
 import * as logger from "winston";
 import { Client, TextChannel, Message, GuildAuditLogs } from "discord.js";
+import { FightBotModule } from "./modules/fight-bot-module";
+import { Roll } from "./modules/roll.module";
 const config = require("../config.json");
 
 export class Bot {
   private PIN_EMOJI = "📌";
   private client: Client;
+  private allModules: any[] = [];
+  // private onMessageModules: Module[] = [];
 
   constructor() {
     this.client = new discord.Client({
@@ -23,7 +27,22 @@ export class Bot {
 
     this.client.on("error", logger.error);
     this.client.login(config.token);
+
+    // i dont think i understand decorators yet if this is necessary
+    new Roll();
+
+    const modules = FightBotModule.getImplementations();
+    for (const module of modules) {
+      logger.info("adding module " + module.name);
+      // document.write(controlPanels[x].name + ", ");
+      this.allModules.push(new module());
+    }
   }
+
+  // addModule(something: Function) {
+  //   logger.info("adding module");
+  //   this.allModules.push(something);
+  // }
 
   _onReady(evt: any) {
     logger.info("Connected");
@@ -126,35 +145,39 @@ export class Bot {
         return;
       }
     }
-    if (msg.content.substring(0, 1) == "!") {
-      var args = msg.content.substring(1).split(" ");
-      var cmd = args[0];
-
-      args = args.splice(1);
-      switch (cmd) {
-        // !ping
-        case "ping":
-          msg.reply("Pong!");
-          break;
-        // Just add any case commands if you want to..
-        case "test-your-might":
-          msg.channel.send("MORTAL KOMBAT!");
-          break;
-        case "fight":
-          let fightMessage =
-            "<@" + msg.author.id + "> has declared a fight with ";
-          for (let [mentionedKey, mentionedUser] of msg.mentions.users) {
-            if (mentionedUser.bot) {
-              msg.reply("You can't fight with a bot, idiot.");
-              return;
+    if (!msg.content.startsWith(config.prefix) || msg.author.bot) return;
+    const args = msg.content.slice(config.prefix.length).split(/ +/);
+    if (args) {
+      const first = args.shift();
+      if (first) {
+        const command = first.toLowerCase();
+        switch (command) {
+          // !ping
+          case "ping":
+            msg.reply("Pong!");
+            break;
+          // Just add any case commands if you want to..
+          case "test-your-might":
+            msg.channel.send("MORTAL KOMBAT!");
+            break;
+          case "fight":
+            let fightMessage =
+              "<@" + msg.author.id + "> has declared a fight with ";
+            for (let [mentionedKey, mentionedUser] of msg.mentions.users) {
+              if (mentionedUser.bot) {
+                msg.reply("You can't fight with a bot, idiot.");
+                return;
+              }
+              fightMessage += "<@" + mentionedUser.id + ">";
             }
-            fightMessage += "<@" + mentionedUser.id + ">";
-          }
 
-          // to: config.fight-channel,
-          msg.channel.send(fightMessage).then((message: any) => message.pin());
+            // to: config.fight-channel,
+            msg.channel
+              .send(fightMessage)
+              .then((message: any) => message.pin());
 
-          break;
+            break;
+        }
       }
     }
   }
