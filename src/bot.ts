@@ -2,9 +2,8 @@ import * as discord from "discord.js";
 import * as logger from "winston";
 import { Client, TextChannel, Message, GuildAuditLogs } from "discord.js";
 import { FightBotModule } from "./modules/fight-bot-module";
-import { Roll } from "./modules/roll.module";
 const config = require("../config.json");
-
+require("./modules/roll.module.ts");
 export class Bot {
   private PIN_EMOJI = "📌";
   private client: Client;
@@ -29,7 +28,9 @@ export class Bot {
     this.client.login(config.token);
 
     // i dont think i understand decorators yet if this is necessary
-    new Roll();
+    // new Roll();
+    // so using anything in the class that it's in causes it to be declared and triggers the decorator...
+    // new TestC()
 
     const modules = FightBotModule.getImplementations();
     for (const module of modules) {
@@ -151,6 +152,17 @@ export class Bot {
       const first = args.shift();
       if (first) {
         const command = first.toLowerCase();
+
+        for (const module of this.allModules) {
+          if (module.onMessage) {
+            if (
+              module.onMessageCommands &&
+              module.onMessageCommands.includes(command)
+            ) {
+              module.onMessage(msg, args);
+            }
+          }
+        }
         switch (command) {
           // !ping
           case "ping":

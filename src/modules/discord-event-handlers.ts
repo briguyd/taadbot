@@ -1,7 +1,8 @@
 import { Message, TextChannel } from "discord.js";
 
 export interface OnMessage {
-  onMessage(msg: Message): void;
+  onMessage(msg: Message, args: string[]): void;
+  onMessageCommands: string[];
 }
 
 export interface onChannelUpdate {

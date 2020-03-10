@@ -15,6 +15,7 @@ export namespace FightBotModule {
     return implementations;
   }
   export function register<T extends Constructor<FightBotModule>>(ctor: T) {
+    console.log("registering");
     implementations.push(ctor);
     return ctor;
   }
