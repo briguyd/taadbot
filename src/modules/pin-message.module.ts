@@ -7,7 +7,10 @@ import { FightBotModule } from "./fight-bot-module";
 export class PinMessage implements OnReactAdd, OnReactRemove {
   private PIN_EMOJI = "📌";
 
-  onReactRemove(messageReaction: MessageReaction, user: User): void {
+  async onReactRemove(
+    messageReaction: MessageReaction,
+    user: User
+  ): Promise<boolean> {
     if (messageReaction.emoji.name === this.PIN_EMOJI) {
       let shouldUnpin = true;
       if (messageReaction.message.reactions) {
@@ -22,10 +25,16 @@ export class PinMessage implements OnReactAdd, OnReactRemove {
         messageReaction.message.unpin();
       }
     }
+    return true;
   }
-  onReactAdd(messageReaction: MessageReaction, user: User): void {
+
+  async onReactAdd(
+    messageReaction: MessageReaction,
+    user: User
+  ): Promise<boolean> {
     if (messageReaction.emoji.name === this.PIN_EMOJI) {
       messageReaction.message.pin();
     }
+    return true;
   }
 }

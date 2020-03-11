@@ -60,5 +60,8 @@ typings/
 # bot config file
 /config.json
 
+# sqlite database file
+/database.sqlite
+
 # build Output
 dist/

@@ -1,14 +1,14 @@
 import * as discord from "discord.js";
 import * as logger from "winston";
-import { Client, TextChannel, Message, GuildAuditLogs } from "discord.js";
+import { Client, TextChannel, Message } from "discord.js";
 import { FightBotModule } from "./modules/fight-bot-module";
 const config = require("../config.json");
-
 // the module classes need to be declared for their decorators to fire off
 require("./modules/roll.module.ts");
 require("./modules/fight.module.ts");
 require("./modules/pin-message.module.ts");
 require("./modules/topic-change.module.ts");
+require("./modules/self-role-assignment.module.ts");
 
 export class Bot {
   private client: Client;
