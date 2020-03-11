@@ -3,9 +3,14 @@ import * as logger from "winston";
 import { Client, TextChannel, Message, GuildAuditLogs } from "discord.js";
 import { FightBotModule } from "./modules/fight-bot-module";
 const config = require("../config.json");
+
+// the module classes need to be declared for their decorators to fire off
 require("./modules/roll.module.ts");
+require("./modules/fight.module.ts");
+require("./modules/pin-message.module.ts");
+require("./modules/topic-change.module.ts");
+
 export class Bot {
-  private PIN_EMOJI = "📌";
   private client: Client;
   private allModules: any[] = [];
   // private onMessageModules: Module[] = [];
@@ -27,23 +32,12 @@ export class Bot {
     this.client.on("error", logger.error);
     this.client.login(config.token);
 
-    // i dont think i understand decorators yet if this is necessary
-    // new Roll();
-    // so using anything in the class that it's in causes it to be declared and triggers the decorator...
-    // new TestC()
-
     const modules = FightBotModule.getImplementations();
     for (const module of modules) {
-      logger.info("adding module " + module.name);
-      // document.write(controlPanels[x].name + ", ");
+      logger.info("Adding module " + module.name);
       this.allModules.push(new module());
     }
   }
-
-  // addModule(something: Function) {
-  //   logger.info("adding module");
-  //   this.allModules.push(something);
-  // }
 
   _onReady(evt: any) {
     logger.info("Connected");
@@ -56,29 +50,10 @@ export class Bot {
   }
 
   _onChannelUpdate(oldCh: TextChannel, newCh: TextChannel) {
-    if (oldCh.topic !== newCh.topic) {
-      newCh.guild
-        .fetchAuditLogs({
-          limit: 1,
-          type: GuildAuditLogs.Actions.CHANNEL_UPDATE
-        })
-        .then(audit => {
-          if (audit && audit.entries) {
-            const first = audit.entries.first();
-            if (first) {
-              const userId = first.executor.id;
-              if (first.changes) {
-                for (const change of first.changes) {
-                  if (change.key === "topic") {
-                    newCh.send(
-                      "<@" + userId + "> changed topic to `" + newCh.topic + "`"
-                    );
-                  }
-                }
-              }
-            }
-          }
-        });
+    for (const module of this.allModules) {
+      if (module.onChannelUpdate) {
+        module.onChannelUpdate(oldCh, newCh);
+      }
     }
   }
 
@@ -96,8 +71,10 @@ export class Bot {
         return;
       }
     }
-    if (messageReaction.emoji.name === this.PIN_EMOJI) {
-      messageReaction.message.pin();
+    for (const module of this.allModules) {
+      if (module.onReactAdd) {
+        module.onReactAdd(messageReaction, user);
+      }
     }
   }
 
@@ -115,19 +92,9 @@ export class Bot {
         return;
       }
     }
-    if (messageReaction.emoji.name === this.PIN_EMOJI) {
-      let shouldUnpin = true;
-      if (messageReaction.message.reactions) {
-        for (let [reactKey, reaction] of messageReaction.message.reactions
-          .cache) {
-          if (reaction.emoji.name === this.PIN_EMOJI) {
-            shouldUnpin = false;
-            break;
-          }
-        }
-      }
-      if (shouldUnpin) {
-        messageReaction.message.unpin();
+    for (const module of this.allModules) {
+      if (module.onReactRemove) {
+        module.onReactRemove(messageReaction, user);
       }
     }
   }
@@ -162,33 +129,6 @@ export class Bot {
               module.onMessage(msg, args);
             }
           }
-        }
-        switch (command) {
-          // !ping
-          case "ping":
-            msg.reply("Pong!");
-            break;
-          // Just add any case commands if you want to..
-          case "test-your-might":
-            msg.channel.send("MORTAL KOMBAT!");
-            break;
-          case "fight":
-            let fightMessage =
-              "<@" + msg.author.id + "> has declared a fight with ";
-            for (let [mentionedKey, mentionedUser] of msg.mentions.users) {
-              if (mentionedUser.bot) {
-                msg.reply("You can't fight with a bot, idiot.");
-                return;
-              }
-              fightMessage += "<@" + mentionedUser.id + ">";
-            }
-
-            // to: config.fight-channel,
-            msg.channel
-              .send(fightMessage)
-              .then((message: any) => message.pin());
-
-            break;
         }
       }
     }
