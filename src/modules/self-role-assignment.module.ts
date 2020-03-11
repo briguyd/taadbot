@@ -22,6 +22,20 @@ export class SelfRoleAssignment
     messageReaction: MessageReaction,
     user: User
   ): Promise<boolean> {
+    // get the stored messages => role/emoji arrays from the db
+    // if we find it, then continue
+    const rolesAndEmojis = await this.keyv.get(messageReaction.message.id);
+    if (rolesAndEmojis) {
+      for (const roleObj of rolesAndEmojis) {
+        // if the emoji matches the new reaction
+        if (roleObj.emoji === messageReaction.emoji.name) {
+          // get the member from the user, and add the role to them
+          messageReaction.message.guild
+            ?.member(user)
+            ?.roles.remove(roleObj.roleId);
+        }
+      }
+    }
     return true;
   }
 
@@ -36,12 +50,10 @@ export class SelfRoleAssignment
       for (const roleObj of rolesAndEmojis) {
         // if the emoji matches the new reaction
         if (roleObj.emoji === messageReaction.emoji.name) {
-          for (const [, user] of messageReaction.users.cache) {
-            // get the member from the user, and add the role to them
-            messageReaction.message.guild
-              ?.member(user)
-              ?.roles.add(roleObj.roleId);
-          }
+          // for (const [, user] of messageReaction.users.cache) {
+          messageReaction.message.guild
+            ?.member(user)
+            ?.roles.add(roleObj.roleId);
         }
       }
     }
@@ -49,6 +61,11 @@ export class SelfRoleAssignment
   }
 
   async onMessage(msg: Message, args: string[]): Promise<boolean> {
+    // TODO: make sure the user who sends the message has the rights to assign these roles
+    if (!msg.member?.roles.cache.has("MANAGE_ROLES")) {
+      msg.reply("You don't have the required permission to assign roles");
+      return false;
+    }
     if (msg.guild) {
       let message = "React to give yourself a role.\n\n";
       const emojiKeys = enumKeys(EmojiCharacters);
