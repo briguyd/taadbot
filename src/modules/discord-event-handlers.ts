@@ -1,18 +1,18 @@
 import { Message, TextChannel, MessageReaction, User } from "discord.js";
 
 export interface OnMessage {
-  onMessage(msg: Message, args: string[]): void;
+  onMessage(msg: Message, args: string[]): Promise<boolean>;
   onMessageCommands: string[];
 }
 
 export interface OnChannelUpdate {
-  onChannelUpdate(oldCh: TextChannel, newCh: TextChannel): void;
+  onChannelUpdate(oldCh: TextChannel, newCh: TextChannel): Promise<boolean>;
 }
 
 export interface OnReactAdd {
-  onReactAdd(messageReaction: MessageReaction, user: User): void;
+  onReactAdd(messageReaction: MessageReaction, user: User): Promise<boolean>;
 }
 
 export interface OnReactRemove {
-  onReactRemove(messageReaction: MessageReaction, user: User): void;
+  onReactRemove(messageReaction: MessageReaction, user: User): Promise<boolean>;
 }

@@ -6,7 +6,7 @@ import { FightBotModule } from "./fight-bot-module";
 @FightBotModule.register
 export class Roll implements OnMessage {
   public onMessageCommands = ["roll"];
-  onMessage(msg: Message, args: string[]) {
+  async onMessage(msg: Message, args: string[]): Promise<boolean> {
     if (args) {
       const diceRegex = /(?:(\d+)\s*X\s*)?(\d*)D(\d*)((?:[+\/*-]\d+)|(?:[+-][LH]))?/i;
 
@@ -27,13 +27,14 @@ export class Roll implements OnMessage {
               total += this.rollDice(+result[3]);
             }
             msg.reply("You rolled " + total);
-            return;
+            return true;
           }
         }
       }
     }
 
     msg.reply("Invalid dice format");
+    return false;
   }
 
   rollDice(max: number) {

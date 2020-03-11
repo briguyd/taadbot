@@ -5,7 +5,10 @@ import { FightBotModule } from "./fight-bot-module";
 
 @FightBotModule.register
 export class TopicChange implements OnChannelUpdate {
-  onChannelUpdate(oldCh: TextChannel, newCh: TextChannel): void {
+  async onChannelUpdate(
+    oldCh: TextChannel,
+    newCh: TextChannel
+  ): Promise<boolean> {
     if (oldCh.topic !== newCh.topic) {
       newCh.guild
         .fetchAuditLogs({
@@ -30,5 +33,6 @@ export class TopicChange implements OnChannelUpdate {
           }
         });
     }
+    return true;
   }
 }
