@@ -13,7 +13,6 @@ require("./modules/topic-change.module.ts");
 export class Bot {
   private client: Client;
   private allModules: any[] = [];
-  // private onMessageModules: Module[] = [];
 
   constructor() {
     this.client = new discord.Client({
