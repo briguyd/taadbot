@@ -62,7 +62,8 @@ export class SelfRoleAssignment
 
   async onMessage(msg: Message, args: string[]): Promise<boolean> {
     // TODO: make sure the user who sends the message has the rights to assign these roles
-    if (!msg.member?.roles.cache.has("MANAGE_ROLES")) {
+    // logger.info(msg.member?.roles.cache);
+    if (!msg.member?.permissions.has("MANAGE_ROLES")) {
       msg.reply("You don't have the required permission to assign roles");
       return false;
     }
