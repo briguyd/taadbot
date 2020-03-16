@@ -95,8 +95,3 @@ export class SelfRoleAssignment
     return true;
   }
 }
-
-class SelfRoleMessage {
-  roles: Role[];
-  message: string;
-}
