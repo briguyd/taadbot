@@ -1,4 +1,8 @@
-# fight-bot
-Discord Bot for managing fights between users
+# taad-bot
+Truly
+Another
+All-Purpose
+Discord
+Bot
 
 Work in progress
