@@ -1,7 +1,7 @@
 {
-  "name": "fight-bot",
+  "name": "taadbot",
   "version": "0.0.1",
-  "description": "Ready? Fight!",
+  "description": "Truly Another All-Purpose Discord Bot",
   "main": "dist/index",
   "author": "Brian DeMaio",
   "license": "MIT",
