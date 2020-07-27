@@ -1,4 +1,4 @@
-# taad-bot
+# taadbot
 Truly
 Another
 All-Purpose
