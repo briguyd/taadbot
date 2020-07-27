@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/briguyd/fight-bot.git"
+    "url": "https://github.com/briguyd/taadbot.git"
   },
   "dependencies": {
     "@keyv/sqlite": "^2.0.2",
