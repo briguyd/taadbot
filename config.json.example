@@ -1,5 +1,10 @@
 {
     "token": "TOKEN_HERE",
-    "fight-channel": 1234567890,
-    "prefix": "!"
+    "prefix": "!",
+    "libsynFeeds": [
+        {
+            "feedURL": "http://popculturerolecall.libsyn.com/rss",
+            "postChannel": "123456789012345"
+        }
+    ]
 }

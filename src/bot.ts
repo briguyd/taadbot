@@ -9,6 +9,7 @@ require("./modules/fight.module.ts");
 require("./modules/pin-message.module.ts");
 require("./modules/topic-change.module.ts");
 require("./modules/self-role-assignment.module.ts");
+require("./modules/libsyn-feed.module.ts");
 
 export class Bot {
   private client: Client;
@@ -34,7 +35,7 @@ export class Bot {
     const modules = FightBotModule.getImplementations();
     for (const module of modules) {
       logger.info("Adding module " + module.name);
-      this.allModules.push(new module());
+      this.allModules.push(new module(this.client));
     }
   }
 
