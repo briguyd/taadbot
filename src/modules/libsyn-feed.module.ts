@@ -32,7 +32,7 @@ export class LibsynFeed {
           if (updateTimestamp > newUpdateTimestamp) {
             newUpdateTimestamp = updateTimestamp;
           }
-          this.postFeedItem(item, feed);
+          this.postFeedItem(item, feedConfig);
         }
       });
       this.lastUpdateTimestamp = newUpdateTimestamp;
