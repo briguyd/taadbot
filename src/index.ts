@@ -1,14 +1,18 @@
 import { Bot } from "./bot";
-import * as logger from "winston";
+import * as winston from "winston";
 
-logger.configure({
-  level: "debug",
+const newLogger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  defaultMeta: { service: 'user-service' },
   transports: [
-    new logger.transports.Console({
-      colorize: true
+    new winston.transports.Console({
+      format: winston.format.combine(winston.format.colorize(), winston.format.simple())
     })
-  ]
+  ],
 });
+winston.add(newLogger);
+
 
 const bot = new Bot();
 bot.start();
