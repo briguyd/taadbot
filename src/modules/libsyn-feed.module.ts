@@ -4,42 +4,51 @@ import * as logger from "winston";
 const config = require("../../config.json");
 @FightBotModule.register
 export class LibsynFeed {
-  private lastUpdateTimestamp = new Date();
+  // private lastUpdateTimestamp = new Date();
+
+  private lastUpdateMap = new Map<string, Date>();
 
   constructor(private client: Client) {
 
     if (config && config.libsynFeeds && config.libsynFeeds.length > 0) {
       for (const feed of config.libsynFeeds) {
         logger.info('Adding libsyn feed for ' + feed.feedURL);
-        this.checkFeed(feed);
-        setInterval(this.checkFeed.bind(this, feed), 60 * 1000);
+        this.lastUpdateMap.set(feed.feedURL, new Date());
+        this.checkFeed(feed, this.lastUpdateMap, this.client);
+        setInterval(this.checkFeed, 60 * 1000, feed, this.lastUpdateMap, this.client);
       }
 
     }
   }
 
-  private checkFeed(feedConfig: any) {
-    const Parser = require('rss-parser');
-    const parser = new Parser();
-
-
-    (async () => {
-      let feed = await parser.parseURL(feedConfig.feedURL);
-      let newUpdateTimestamp = this.lastUpdateTimestamp;
-      feed.items.forEach((item: any) => {
+  private checkFeed(feedConfig: any, lastUpdateMap: Map<string, Date>, client: Client) {
+    let Parser = require('rss-parser');
+    let parser = new Parser();
+    const lastUpdate = lastUpdateMap.get(feedConfig.feedURL) || new Date();
+    parser.parseURL(feedConfig.feedURL, function(err: any, feed: any) {
+      if (err) {
+        logger.error(err);
+      }
+      let newUpdateTimestamp = lastUpdateMap.get(feedConfig.feedURL) || new Date();
+      for (const item of feed.items) {
         const updateTimestamp = new Date(item.isoDate);
-        if (updateTimestamp > this.lastUpdateTimestamp) {
+        if (updateTimestamp > lastUpdate) {
           if (updateTimestamp > newUpdateTimestamp) {
             newUpdateTimestamp = updateTimestamp;
           }
-          this.postFeedItem(item, feedConfig);
+          this.postFeedItem(item, feedConfig, client);
         }
-      });
-      this.lastUpdateTimestamp = newUpdateTimestamp;
-    })();
+      }
+
+
+      lastUpdateMap.set(feedConfig.feedURL, newUpdateTimestamp);
+      feed = null;
+    });
+    parser = null;
+    Parser = null;
   }
 
-  private postFeedItem(item: any, feed: any) {
+  private postFeedItem(item: any, feed: any, client: Client) {
     const embed = new MessageEmbed()
       .setColor('#fd6e88')
       .setTitle(item.title)
@@ -48,6 +57,6 @@ export class LibsynFeed {
       .setImage(item.itunes.image)
       .setAuthor(feed.title, feed.image.url)
       .setTimestamp(new Date(item.pubDate));
-    this.client.channels.fetch('' + feed.postChannel).then((channel: TextChannel) => channel.send(embed)).catch(console.error);
+    client.channels.fetch('' + feed.postChannel).then((channel: TextChannel) => channel.send(embed)).catch(console.error);
   }
 }
