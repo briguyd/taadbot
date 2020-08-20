@@ -2,6 +2,7 @@ import { Client, TextChannel, MessageEmbed } from "discord.js";
 import { FightBotModule } from "./fight-bot-module";
 import * as logger from "winston";
 const config = require("../../config.json");
+const fetch = require('node-fetch');
 @FightBotModule.register
 export class LibsynFeed {
   // private lastUpdateTimestamp = new Date();
@@ -21,11 +22,19 @@ export class LibsynFeed {
     }
   }
 
-  private checkFeed(feedConfig: any, lastUpdateMap: Map<string, Date>, client: Client) {
-    let Parser = require('rss-parser');
+  private async checkFeed(feedConfig: any, lastUpdateMap: Map<string, Date>, client: Client) {
+    const response = await fetch(feedConfig.feedURL);
+    const body = await response.text();
+    // console.log(body);
+
+
+
+
+
+        let Parser = require('rss-parser');
     let parser = new Parser();
     const lastUpdate = lastUpdateMap.get(feedConfig.feedURL) || new Date();
-    parser.parseURL(feedConfig.feedURL, function(err: any, feed: any) {
+    parser.parseString(body, function(err: any, feed: any) {
       if (err) {
         logger.error(err);
       }
@@ -47,6 +56,33 @@ export class LibsynFeed {
     parser = null;
     Parser = null;
   }
+
+  // private checkFeed(feedConfig: any, lastUpdateMap: Map<string, Date>, client: Client) {
+  //   let Parser = require('rss-parser');
+  //   let parser = new Parser();
+  //   const lastUpdate = lastUpdateMap.get(feedConfig.feedURL) || new Date();
+  //   parser.parseURL(feedConfig.feedURL, function(err: any, feed: any) {
+  //     if (err) {
+  //       logger.error(err);
+  //     }
+  //     let newUpdateTimestamp = lastUpdateMap.get(feedConfig.feedURL) || new Date();
+  //     for (const item of feed.items) {
+  //       const updateTimestamp = new Date(item.isoDate);
+  //       if (updateTimestamp > lastUpdate) {
+  //         if (updateTimestamp > newUpdateTimestamp) {
+  //           newUpdateTimestamp = updateTimestamp;
+  //         }
+  //         this.postFeedItem(item, feedConfig, client);
+  //       }
+  //     }
+
+
+  //     lastUpdateMap.set(feedConfig.feedURL, newUpdateTimestamp);
+  //     feed = null;
+  //   });
+  //   parser = null;
+  //   Parser = null;
+  // }
 
   private postFeedItem(item: any, feed: any, client: Client) {
     const embed = new MessageEmbed()
