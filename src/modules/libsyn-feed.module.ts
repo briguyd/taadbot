@@ -39,7 +39,15 @@ export class LibsynFeed {
           if (updateTimestamp > newUpdateTimestamp) {
             newUpdateTimestamp = updateTimestamp;
           }
-          this.postFeedItem(item, feedConfig, client);
+          const embed = new MessageEmbed()
+            .setColor('#fd6e88')
+            .setTitle(item.title)
+            .setDescription(item.contentSnippet)
+            .setURL(item.link)
+            .setImage(item.itunes.image)
+            .setAuthor(feed.title, feed.image.url)
+            .setTimestamp(new Date(item.pubDate));
+          client.channels.fetch('' + feed.postChannel).then((channel: TextChannel) => channel.send(embed)).catch(console.error);
         }
       }
 
@@ -49,17 +57,5 @@ export class LibsynFeed {
     });
     parser = null;
     Parser = null;
-  }
-
-  private postFeedItem(item: any, feed: any, client: Client) {
-    const embed = new MessageEmbed()
-      .setColor('#fd6e88')
-      .setTitle(item.title)
-      .setDescription(item.contentSnippet)
-      .setURL(item.link)
-      .setImage(item.itunes.image)
-      .setAuthor(feed.title, feed.image.url)
-      .setTimestamp(new Date(item.pubDate));
-    client.channels.fetch('' + feed.postChannel).then((channel: TextChannel) => channel.send(embed)).catch(console.error);
   }
 }
