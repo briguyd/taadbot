@@ -47,7 +47,7 @@ export class LibsynFeed {
             .setImage(item.itunes.image)
             .setAuthor(feed.title, feed.image.url)
             .setTimestamp(new Date(item.pubDate));
-          client.channels.fetch('' + feed.postChannel).then((channel: TextChannel) => channel.send(embed)).catch(console.error);
+          client.channels.fetch('' + feedConfig.postChannel).then((channel: TextChannel) => channel.send(embed)).catch(console.error);
         }
       }
 
